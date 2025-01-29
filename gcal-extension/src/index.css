@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+.fade-in {
+	opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 100ms;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes to-rect {
+  0% { border-radius: 9999px; }
+  25% { border-radius: 24px; }
+  50% { border-radius: 20px; }
+  100% { border-radius: 16px; }
+}
+
+@keyframes to-round {
+  0% { border-radius: 16px; }
+  25% { border-radius: 20px; }
+  50% { border-radius: 24px; }
+  100% { border-radius: 9999px; }
+}
+
+.animate-to-rect {
+  animation: to-rect 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-to-round {
+  animation: to-round 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fullshadow {
+  --tw-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.6);
+  --tw-shadow-colored: 0 0 30px 5px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  .fullshadow {
+	--tw-shadow: 0 0 30px 5px rgba(255, 255, 255, 0.3);
+  }
+}
+
