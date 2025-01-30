@@ -1,14 +1,18 @@
-@import 'tailwindcss';
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
-.fade-in {
+
+.gcal-quick-add .fade-in {
 	opacity: 1;
-	animation-name: fadeInOpacity;
+	animation-name: gcal-quick-add-fadeInOpacity;
 	animation-iteration-count: 1;
 	animation-timing-function: ease-in;
 	animation-duration: 100ms;
 }
 
-@keyframes fadeInOpacity {
+@keyframes gcal-quick-add-fadeInOpacity {
 	0% {
 		opacity: 0;
 	}
@@ -17,36 +21,90 @@
 	}
 }
 
-@keyframes to-rect {
+@keyframes gcal-quick-add-to-rect {
   0% { border-radius: 9999px; }
   25% { border-radius: 24px; }
   50% { border-radius: 20px; }
   100% { border-radius: 16px; }
 }
 
-@keyframes to-round {
+@keyframes gcal-quick-add-to-round {
   0% { border-radius: 16px; }
   25% { border-radius: 20px; }
   50% { border-radius: 24px; }
   100% { border-radius: 9999px; }
 }
 
-.animate-to-rect {
-  animation: to-rect 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+.gcal-quick-add .animate-to-rect {
+  animation: gcal-quick-add-to-rect 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.animate-to-round {
-  animation: to-round 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+.gcal-quick-add .animate-to-round {
+  animation: gcal-quick-add-to-round 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fullshadow {
+
+@keyframes gcal-quick-add-to-rect-tr {
+  0% { 
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px; }
+  25% { 
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 20px; }
+  50% { 
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 10px; }
+  100% {
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 0px; }
+}
+
+.gcal-quick-add .animate-to-rect-tr {
+  animation: gcal-quick-add-to-rect-tr 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+@keyframes gcal-quick-add-to-round-tr {
+  0% { 
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+  }
+  25% { 
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+  }
+  50% { 
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 20px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+  }
+  100% { 
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+  }
+}
+
+.gcal-quick-add .animate-to-round-tr {
+  animation: gcal-quick-add-to-round-tr 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.gcal-quick-add .fullshadow {
   --tw-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.6);
   --tw-shadow-colored: 0 0 30px 5px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 @media (prefers-color-scheme: dark) {
-  .fullshadow {
+  .gcal-quick-add .fullshadow {
 	--tw-shadow: 0 0 30px 5px rgba(255, 255, 255, 0.3);
   }
 }

@@ -67,6 +67,8 @@ async function handleEventRequest(request) {
 		  '- If a user says an event is "until" a time, that means the event ends at that time\n' +
 		  '- If a user says an event is "to" a time, that means the event ends at that time\n' +
 		  '- If a user says an event is "between" two times, that means the event starts at the first time and ends at the second time. that includes if they put a "-" between the two times (ie 1-2) means starts at 1, and ends at 2\n' +
+      '- Do not write arbitrary times unless they are specified, ex: 1 is 1:00 or 13:00 depending on context, 1:05 is 1:05\n\n' +
+
 		  
 		  'The output must be valid JSON with the following fields: Type, Title, Start, End, Other.\n' +
 		  '- If a parameter is not given by the prompt, leave it as an empty string ("").\n' +

@@ -204,7 +204,8 @@ const QuickAddEvent = () => {
         params.append('recur', recur.join(';'));
       }
 
-      window.location.href = `${baseUrl}?${params}`;
+      window.location.href = `${baseUrl}?${params.toString()}`;
+
       
       setInput('');
       setRecurrenceInput('');
@@ -223,12 +224,12 @@ const QuickAddEvent = () => {
   const getOpacityClass = (index) => {
     // Map index to predefined opacity classes
     const opacityMap = {
-      0: 'bg-black/15 dark:bg-white/15',
-      1: 'bg-black/20 dark:bg-white/20',
-      2: 'bg-black/25 dark:bg-white/25',
-      3: 'bg-black/30 dark:bg-white/30'
+      0: 'bg-gray-200 dark:bg-gray-700',
+      1: 'bg-gray-300 dark:bg-gray-600',
+      2: 'bg-gray-400 dark:bg-gray-500',
+      3: 'bg-gray-500 dark:bg-gray-400'
     };
-    return opacityMap[index] || 'bg-black/40 dark:bg-white/40';
+    return opacityMap[index] || 'bg-gray-600 dark:bg-gray-300';
   };
 
   // Reset states when closing modal
@@ -259,13 +260,13 @@ const QuickAddEvent = () => {
             className="fixed inset-0 z-[6000]"
             onClick={handleClose}
           >
-            {/* Remove mt-[-300px] and adjust positioning */}
             <div className="fixed top-56 left-0 right-0">
                 <div className="text-xs text-center text-gray-500 relative z-[7000] mx-auto mb-2">
-                    Press TAB to {showRecurrence ? 'hide' : 'show'} recurrence options
+                    Press TAB to {showRecurrence ? 'add' : 'remove'} recurrence options
                 </div>
               <form 
                 onSubmit={handleSubmit} 
+                disabled={loading || messages.length > 0}
                 className={`bg-white px-2 dark:bg-black text-black dark:text-white max-w-xl mx-auto flex gap-2 ring-2 ring-blue-400 fullshadow min-h-[53px] relative z-[6001] justify-center ${
                   !hasRecurrenceChanged 
                     ? (showRecurrence ? 'h-[106px] rounded-xl' : 'h-[53px] rounded-full')
@@ -283,7 +284,7 @@ const QuickAddEvent = () => {
                     value={input}
                     onChange={(e) => {setInput(e.target.value); setMessages([])}}
                     placeholder="Add event (e.g. 'lunch on friday from 12-1)"
-                    className="w-full px-4 py-2 focus:outline-none"
+                    className="w-full px-4 py-[9.75px] focus:outline-none"
                     autoFocus
                   />
                   {showRecurrenceInput && (<>
@@ -294,7 +295,7 @@ const QuickAddEvent = () => {
                       value={recurrenceInput}
                       onChange={(e) => setRecurrenceInput(e.target.value)}
                       placeholder="Set recurrence (e.g. 'weekly until March 1')"
-                      className=" absolute top-[53px] left-0 w-full px-4 py-2 focus:outline-none transition-opacity duration-100"
+                      className=" absolute top-[53px] left-0 w-full px-4 py-[9.75px] focus:outline-none transition-opacity duration-100"
                     />
                   </>
                   )}
@@ -317,7 +318,9 @@ const QuickAddEvent = () => {
                   {error}
                 </p>
               )}
-              <div className='relative h-[53px] pointer-events-none z-[7001] '> 
+
+              <div className='absolute top-0 left-0 right-0 z-[7001] top-[24px]'>
+                <div className='relative w-full mx-auto max-w-xl z-[7001]'>
                 {messages.map((message, index) => (
                   <form
                     key={index}
@@ -326,12 +329,17 @@ const QuickAddEvent = () => {
                       top: 0,
                       right: 0,
                       width: `${60 - (index * 15)}%`,
+                      zIndex: 7000 + index,
                     }}
-                    className={`p-2 flex items-center text-sm min-h-[53px] fade-in pointer-events-auto ${getOpacityClass(index)} text-black dark:text-white h-[53px]
-                      ${(index == message.length) ? 
-                      showRecurrence ? 'rounded-tr-2xl rounded-l-full' : 'rounded-full'
-                        : 'rounded-full'}`}
-                    onSubmit={(e) => {e.preventDefault; handleSubmit();}}
+                    className={`p-2 flex items-center text-sm min-h-[53px] fade-in pointer-events-auto ${getOpacityClass(index)} text-black dark:text-white h-[53px] 
+                      ${(index === messages.length - 1)
+                          ? (showRecurrence ? 'animate-to-rect-tr' : 'animate-to-round-tr')
+                            : 'rounded-full'}`}
+                    onSubmit={(e) => {
+                      const newMessages = [...messages];
+                      newMessages[index].submitted = true; setMessages(newMessages);
+                      handleSubmit(e);
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-between w-full">
@@ -361,6 +369,7 @@ const QuickAddEvent = () => {
                     </div>
                   </form>
                 ))}
+                 </div> 
               </div>
             </div>
           </div>
@@ -373,6 +382,7 @@ const QuickAddEvent = () => {
 // Mount the component
 const root = document.createElement("div");
 root.id = "quick-add-calendar-root";
+root.className = "gcal-quick-add";
 document.body.appendChild(root);
 
 createRoot(root).render(<QuickAddEvent />);
