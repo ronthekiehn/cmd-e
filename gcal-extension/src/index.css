@@ -46,49 +46,63 @@
 
 @keyframes gcal-quick-add-to-rect-tr {
   0% { 
+    border-top-left-radius: 26px;
+    border-bottom-left-radius: 26px;
     border-top-right-radius: 9999px;
-    border-bottom-right-radius: 9999px; }
+    border-bottom-right-radius: 9999px;
+  }
   25% { 
+    border-top-left-radius: 26px;
+    border-bottom-left-radius: 26px;
     border-top-right-radius: 24px;
-    border-bottom-right-radius: 20px; }
+    border-bottom-right-radius: 20px;
+  }
   50% { 
+    border-top-left-radius: 26px;
+    border-bottom-left-radius: 26px;
     border-top-right-radius: 20px;
-    border-bottom-right-radius: 10px; }
+    border-bottom-right-radius: 10px;
+  }
   100% {
+    border-top-left-radius: 26px;
+    border-bottom-left-radius: 26px;
     border-top-right-radius: 16px;
-    border-bottom-right-radius: 0px; }
+    border-bottom-right-radius: 0px;
+  }
 }
 
 .gcal-quick-add .animate-to-rect-tr {
   animation: gcal-quick-add-to-rect-tr 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
-  border-top-left-radius: 9999px;
-  border-bottom-left-radius: 9999px;
 }
 
 @keyframes gcal-quick-add-to-round-tr {
   0% { 
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 16px;
     border-bottom-right-radius: 0px;
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
+
   }
   25% { 
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 10px;
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
+
   }
   50% { 
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 24px;
     border-bottom-right-radius: 20px;
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
+
   }
   100% { 
-    border-top-right-radius: 9999px;
-    border-bottom-right-radius: 9999px;
     border-top-left-radius: 9999px;
     border-bottom-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+
   }
 }
 
@@ -96,16 +110,15 @@
   animation: gcal-quick-add-to-round-tr 100ms forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
 .gcal-quick-add .fullshadow {
-  --tw-shadow: 0 0 30px 5px rgba(0, 0, 0, 0.6);
-  --tw-shadow-colored: 0 0 30px 5px var(--tw-shadow-color);
+  --tw-shadow: 0px 10px 40px -3px rgba(0,0,0,0.5);
+  --tw-shadow-colored:  0px 10px 40px -3px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 @media (prefers-color-scheme: dark) {
   .gcal-quick-add .fullshadow {
-	--tw-shadow: 0 0 30px 5px rgba(255, 255, 255, 0.3);
+	--tw-shadow: 0px 10px 40px -3px rgba(255, 255, 255, 0.3);
   }
 }
 

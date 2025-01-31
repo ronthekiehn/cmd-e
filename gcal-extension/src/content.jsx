@@ -3,8 +3,8 @@ import { Plus } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
-const API_URL = 'http://localhost:8787'
-//const API_URL = 'https://gcal-proxy.ronthekiehn.workers.dev/'
+//const API_URL = 'http://localhost:8787'
+const API_URL = 'https://gcal-proxy.ronthekiehn.workers.dev'
 
 const QuickAddEvent = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,14 +106,23 @@ const QuickAddEvent = () => {
       return await response.clone().json();
     } catch (error) {
       console.error('Failed to parse JSON:', error);
-
+      
       const text = await response.clone().text();
       console.log('Raw response:', text);
-      const cleanedText = text.replace(/^```json\s*|\s*```$/g, '').trim();
-      console.log("retrying with cleaned text:", cleanedText);
+      
+      // More aggressive cleaning - remove all backticks and 'json' markers
+      const cleanedText = text
+        .replace(/```json\s*/g, '')  // Remove opening ```json
+        .replace(/```\s*$/g, '')     // Remove closing ```
+        .replace(/^```|```$/g, '')   // Remove any remaining backticks
+        .trim();
+        
+      console.log("Cleaned text:", cleanedText);
+      
       try {
         return JSON.parse(cleanedText);
-      } catch {
+      } catch (parseError) {
+        console.error('Failed to parse cleaned JSON:', parseError);
         throw new Error('Failed to parse JSON');
       }
     }
@@ -160,6 +169,11 @@ const QuickAddEvent = () => {
       console.log('Event data:', eventData);
       console.log('Recurrence data:', eventData.Recurrence);
       
+      if (messages.length > 0) {
+        const newMessages = [...messages];
+        newMessages.forEach(message => message.submitted = true);
+        setMessages(newMessages);
+      }
       if (!eventData) {
         throw new Error('Invalid event data received');
       }
@@ -224,12 +238,13 @@ const QuickAddEvent = () => {
   const getOpacityClass = (index) => {
     // Map index to predefined opacity classes
     const opacityMap = {
-      0: 'bg-gray-200 dark:bg-gray-700',
-      1: 'bg-gray-300 dark:bg-gray-600',
-      2: 'bg-gray-400 dark:bg-gray-500',
-      3: 'bg-gray-500 dark:bg-gray-400'
+      // Light Mode (bg-black/opacity)      // Dark Mode (bg-white/opacity)
+      0: 'bg-[#D9D9D9] dark:bg-[#262626]',  // 15% opacity equivalent
+      1: 'bg-[#CCCCCC] dark:bg-[#333333]',  // 20% opacity equivalent
+      2: 'bg-[#BFBFBF] dark:bg-[#404040]',  // 25% opacity equivalent
+      3: 'bg-[#B3B3B3] dark:bg-[#4D4D4D]',  // 30% opacity equivalent
     };
-    return opacityMap[index] || 'bg-gray-600 dark:bg-gray-300';
+    return opacityMap[index] || 'bg-[#999999] dark:bg-[#666666]'; // 40% default
   };
 
   // Reset states when closing modal
@@ -261,8 +276,8 @@ const QuickAddEvent = () => {
             onClick={handleClose}
           >
             <div className="fixed top-56 left-0 right-0">
-                <div className="text-xs text-center text-gray-500 relative z-[7000] mx-auto mb-2">
-                    Press TAB to {showRecurrence ? 'add' : 'remove'} recurrence options
+                <div className="text-xs text-left text-[#808080] relative z-[7000] max-w-xl mx-auto mb-1 pl-6">
+                    Press TAB to {showRecurrence ? 'remove' : 'add'} a recurrence
                 </div>
               <form 
                 onSubmit={handleSubmit} 
@@ -288,7 +303,7 @@ const QuickAddEvent = () => {
                     autoFocus
                   />
                   {showRecurrenceInput && (<>
-                    <div className='absolute left-[16px] top-[45px] h-[1px] bg-[#A9A9A9] w-9/10'></div>
+                    <div className='absolute left-[16px] top-[45px] h-[1px] bg-[darkgray] w-9/10'></div>
                     <input
                       ref={recurrenceInputRef}
                       type="text"
@@ -319,8 +334,16 @@ const QuickAddEvent = () => {
                 </p>
               )}
 
-              <div className='absolute top-0 left-0 right-0 z-[7001] top-[24px]'>
-                <div className='relative w-full mx-auto max-w-xl z-[7001]'>
+              <div className='absolute top-0 left-0 right-0 z-[7001] top-[20px] pointer-events-none'>
+                <div className={`relative w-full mx-auto max-w-xl z-[7001] overflow-hidden pointer-events-none
+                  ${
+                    !hasRecurrenceChanged 
+                      ? (showRecurrence ? 'h-[106px] rounded-xl' : 'h-[53px] rounded-full')
+                      : (showRecurrence ? 'h-[106px] animate-to-rect' : 'h-[53px] animate-to-round')
+                  }`}
+                  style={{
+                    transition: 'height 100ms cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}>
                 {messages.map((message, index) => (
                   <form
                     key={index}
@@ -330,14 +353,10 @@ const QuickAddEvent = () => {
                       right: 0,
                       width: `${60 - (index * 15)}%`,
                       zIndex: 7000 + index,
+                      
                     }}
-                    className={`p-2 flex items-center text-sm min-h-[53px] fade-in pointer-events-auto ${getOpacityClass(index)} text-black dark:text-white h-[53px] 
-                      ${(index === messages.length - 1)
-                          ? (showRecurrence ? 'animate-to-rect-tr' : 'animate-to-round-tr')
-                            : 'rounded-full'}`}
+                    className={`p-2 flex items-center text-sm min-h-[53px] fade-in pointer-events-auto ${getOpacityClass(index)} text-black dark:text-white h-[53px] rounded-l-full`}
                     onSubmit={(e) => {
-                      const newMessages = [...messages];
-                      newMessages[index].submitted = true; setMessages(newMessages);
                       handleSubmit(e);
                     }}
                     onClick={(e) => e.stopPropagation()}
@@ -353,7 +372,7 @@ const QuickAddEvent = () => {
                           setMessages(newMessages);
                         }}
                         onFocus={() => handleMessageFocus(index)}
-                        disabled={message.submitted}
+                        disabled={loading || message.submitted}
                         className="w-full px-4 py-2 rounded-full focus:outline-none"
                         placeholder={message.question}
                         autoFocus

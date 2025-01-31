@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Jot",
-    "version": "1.0",
+    "name": "cmd + e",
+    "version": "0.5",
     "content_scripts": [
       {
         "matches": ["https://calendar.google.com/*"],
