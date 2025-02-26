@@ -275,7 +275,7 @@ const QuickAddEvent = () => {
             className="fixed inset-0 z-[6000]"
             onClick={handleClose}
           >
-            <div className="fixed top-56 left-0 right-0">
+            <div className="fixed top-60 left-0 right-0">
                 <div className="text-xs text-left text-[#808080] relative z-[7000] max-w-xl mx-auto mb-1 pl-6">
                     Press TAB to {showRecurrence ? 'remove' : 'add'} a recurrence
                 </div>
@@ -309,7 +309,7 @@ const QuickAddEvent = () => {
                       type="text"
                       value={recurrenceInput}
                       onChange={(e) => setRecurrenceInput(e.target.value)}
-                      placeholder="Set recurrence (e.g. 'weekly until March 1')"
+                      placeholder="Set recurrence (e.g. 'weekly until march 1')"
                       className=" absolute top-[53px] left-0 w-full px-4 py-[9.75px] focus:outline-none transition-opacity duration-100"
                     />
                   </>
@@ -334,7 +334,7 @@ const QuickAddEvent = () => {
                 </p>
               )}
 
-              <div className='absolute top-0 left-0 right-0 z-[7001] top-[20px] pointer-events-none'>
+              <div className='absolute left-0 right-0 z-[7001] top-[20px] pointer-events-none'>
                 <div className={`relative w-full mx-auto max-w-xl z-[7001] overflow-hidden pointer-events-none
                   ${
                     !hasRecurrenceChanged 
