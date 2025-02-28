@@ -1,5 +1,5 @@
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     // Handle CORS preflight requests
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -25,9 +25,9 @@ export default {
       const url = new URL(request.url);
       
       if (url.pathname === '/event') {
-        return await handleEventRequest(request);
+        return await handleEventRequest(request, env);
       } else if (url.pathname === '/recurrence') {
-        return await handleRecurrenceRequest(request);
+        return await handleRecurrenceRequest(request, env);
       }
       
       return new Response('Not Found', { status: 404 });
@@ -48,7 +48,7 @@ export default {
   }
 };
 
-async function handleEventRequest(request) {
+async function handleEventRequest(request, env) {
   const { input, timestamp } = await request.json();
   
   const eventInstructions = 
@@ -85,7 +85,7 @@ async function handleEventRequest(request) {
   
 	const prompt = `Reference timestamp: ${timestamp}\n\nUser input: ${input}`;
   
-  const apiKey = "AIzaSyAutSht0blvtAT5XShhi60OsCW6h3uhxLo";
+  const apiKey = env.API_KEY;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   
   const requestBody = {
@@ -137,11 +137,11 @@ async function handleRecurrenceRequest(request) {
     '  "count": number (optional),\n' +
     '  "until": "ISO8601 date" (optional)\n' +
     '}' +
-	'Remember, no markdown, and no code blocks, only JSON';;
+	'Remember, no markdown, and no code blocks, only JSON';
 
   const prompt = `Reference timestamp: ${timestamp}\n\nUser input: ${input}`;
   
-  const apiKey = "AIzaSyAutSht0blvtAT5XShhi60OsCW6h3uhxLo";
+  const apiKey = env.API_KEY;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   
   const requestBody = {

@@ -1,7 +1,12 @@
 {
     "manifest_version": 3,
-    "name": "cmd + e",
-    "version": "0.5",
+    "name": "cmd + e: AI Event Creation for GCal", 
+    "version": "0.1",
+    "icons": {
+      "16": "assets/gcal16.png",
+      "48": "assets/gcal48.png",
+      "128": "assets/gcal128.png"
+    },
     "content_scripts": [
       {
         "matches": ["https://calendar.google.com/*"],
@@ -11,5 +16,8 @@
     ],
     "host_permissions": [
       "https://gcal-proxy.ronthekiehn.workers.dev/*"
+    ],
+    "permissions": [
+        "storage"
     ]
   }

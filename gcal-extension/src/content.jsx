@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
@@ -19,6 +19,10 @@ const QuickAddEvent = () => {
   const recurrenceInputRef = useRef(null);
   const activeMessageInputRef = useRef(null);
   const [hasRecurrenceChanged, setHasRecurrenceChanged] = useState(false);
+  const [position, setPosition] = useState({ x: 'calc(50% - 288px)', y: '250px' });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef({ startX: 0, startY: 0 });
+  const containerRef = useRef(null);
 
   // Track the active message input
   const handleMessageFocus = (index) => {
@@ -100,6 +104,76 @@ const QuickAddEvent = () => {
     return () => window.removeEventListener('keydown', handleTab);
   }, [isOpen, showRecurrence, messages.length]);
 
+  // Load saved position
+  useEffect(() => {
+    chrome.storage.sync.get(['quickAddPosition'], (result) => {
+      if (result.quickAddPosition) {
+        setPosition(result.quickAddPosition);
+      }
+    });
+  }, []);
+  
+  // Add window resize listener to center the modal
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition(prevPosition => ({
+        ...prevPosition,
+        x: 'calc(50% - 288px)'  // Center the modal
+      }));
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    const rect = containerRef.current.getBoundingClientRect();
+    dragRef.current = {
+      startX: e.clientX - rect.left,
+      startY: e.clientY - rect.top
+    };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+
+    const newX = e.clientX - dragRef.current.startX;
+    const newY = e.clientY - dragRef.current.startY;
+
+    // Get container dimensions
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerWidth = containerRect.width + 16;
+    const containerHeight = containerRect.height + 69;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // Constrain to window bounds
+    const x = Math.min(Math.max(newX, 16), windowWidth - containerWidth);
+    const y = Math.min(Math.max(newY, 16), windowHeight - containerHeight);
+
+    setPosition({ x: `${x}px`, y: `${y}px` });
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      chrome.storage.sync.set({ quickAddPosition: position });
+    }
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.body.classList.add('gcal-quick-add-no-select');
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      document.body.classList.remove('gcal-quick-add-no-select');
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   const parseJsonResponse = async (response) => {
     try {
@@ -108,7 +182,7 @@ const QuickAddEvent = () => {
       console.error('Failed to parse JSON:', error);
       
       const text = await response.clone().text();
-      console.log('Raw response:', text);
+      //console.log('Raw response:', text);
       
       // More aggressive cleaning - remove all backticks and 'json' markers
       const cleanedText = text
@@ -117,12 +191,12 @@ const QuickAddEvent = () => {
         .replace(/^```|```$/g, '')   // Remove any remaining backticks
         .trim();
         
-      console.log("Cleaned text:", cleanedText);
+      //console.log("Cleaned text:", cleanedText);
       
       try {
         return JSON.parse(cleanedText);
       } catch (parseError) {
-        console.error('Failed to parse cleaned JSON:', parseError);
+        //console.error('Failed to parse cleaned JSON:', parseError);
         throw new Error('Failed to parse JSON');
       }
     }
@@ -133,7 +207,7 @@ const QuickAddEvent = () => {
     setLoading(true);
     setError(null);
 
-    console.log(input + messages.map((message) => message.prepend + message.response).join(' '))
+    //console.log(input + messages.map((message) => message.prepend + message.response).join(' '))
 
     try {
       // First, get event details
@@ -166,8 +240,8 @@ const QuickAddEvent = () => {
         eventData = await parseJsonResponse(eventResponse);
       }
 
-      console.log('Event data:', eventData);
-      console.log('Recurrence data:', eventData.Recurrence);
+      // console.log('Event data:', eventData);
+      // console.log('Recurrence data:', eventData.Recurrence);
       
       if (messages.length > 0) {
         const newMessages = [...messages];
@@ -226,6 +300,7 @@ const QuickAddEvent = () => {
       setShowRecurrence(false);
       setMessages([]);
       setIsOpen(false);
+      chrome.storage.sync.set({ quickAddPosition: position });
     } catch (error) {
       console.error('Failed to create event:', error);
       setError('Event creation failed');
@@ -256,7 +331,8 @@ const QuickAddEvent = () => {
     setShowRecurrence(false);
     setShowRecurrenceInput(false);
     setRecurrenceInput('');
-    setHasRecurrenceChanged(false); // Reset when modal closes
+    setHasRecurrenceChanged(false);
+    chrome.storage.sync.set({ quickAddPosition: position });
   };
 
   return (
@@ -275,14 +351,30 @@ const QuickAddEvent = () => {
             className="fixed inset-0 z-[6000]"
             onClick={handleClose}
           >
-            <div className="fixed top-60 left-0 right-0">
-                <div className="text-xs text-left text-[#808080] relative z-[7000] max-w-xl mx-auto mb-1 pl-6">
-                    Press TAB to {showRecurrence ? 'remove' : 'add'} a recurrence
-                </div>
+            <div 
+              ref={containerRef}
+              className="fixed z-[7000]"
+              style={{ 
+                top: position.y, 
+                left: position.x,
+                cursor: isDragging ? 'grabbing' : 'auto'
+              }}
+            >
+              <div className="gcal-quick-add-no-select text-xs text-left text-[#808080] relative mb-1 pl-6">
+                Press TAB to {showRecurrence ? 'remove' : 'add'} a recurrence
+              </div>
+              <div 
+                className={`absolute -left-7 ${showRecurrence ? 'top-[57.5px]' : 'top-[31.5px]'} p-2 cursor-grab text-[#808080] hover:text-blue-500 transition-all duration-100`}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={handleMouseDown}
+                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+              >
+                <GripVertical size={16} />
+              </div>
               <form 
                 onSubmit={handleSubmit} 
                 disabled={loading || messages.length > 0}
-                className={`bg-white px-2 dark:bg-black text-black dark:text-white max-w-xl mx-auto flex gap-2 ring-2 ring-blue-400 fullshadow min-h-[53px] relative z-[6001] justify-center ${
+                className={`bg-white px-2 dark:bg-black text-black dark:text-white max-w-xl mx-auto flex gap-2 ring-2 ring-blue-400 fullshadow min-h-[53px] w-full sm:w-[576px] relative z-[6001] justify-center ${
                   !hasRecurrenceChanged 
                     ? (showRecurrence ? 'h-[106px] rounded-xl' : 'h-[53px] rounded-full')
                     : (showRecurrence ? 'h-[106px] animate-to-rect' : 'h-[53px] animate-to-round')
