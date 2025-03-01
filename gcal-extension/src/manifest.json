@@ -1,12 +1,13 @@
 {
     "manifest_version": 3,
     "name": "cmd + e: AI Event Creation for GCal", 
-    "version": "0.1",
+    "version": "0.11",
     "icons": {
       "16": "assets/gcal16.png",
       "48": "assets/gcal48.png",
       "128": "assets/gcal128.png"
     },
+    "description": "AI Event Creation for Google Calendar",
     "content_scripts": [
       {
         "matches": ["https://calendar.google.com/*"],
